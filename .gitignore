@@ -144,3 +144,5 @@ Thumbs.db
 /results/**/*.json
 
 escort_env
+
+azure_config.json

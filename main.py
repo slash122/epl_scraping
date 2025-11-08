@@ -14,7 +14,7 @@ RESULTS_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), 'result
 def main():
     logger = setup_logger(name="main_job")
     run_jobs(logger)
-    save_to_azure(logger)
+    # save_to_azure(logger)
 
 def run_jobs(logger):
     clear_results()
