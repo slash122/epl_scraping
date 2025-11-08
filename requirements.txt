@@ -7,8 +7,6 @@ constantly==23.10.4
 cryptography==46.0.3
 cssselect==1.3.0
 defusedxml==0.7.1
-# Editable Git install with no remote (escort-scraping==0.1.0)
--e /home/gleb/Developing/escort_scraping
 filelock==3.20.0
 hyperlink==21.0.0
 idna==3.11
