@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 import json
-import pdb
 from parsers.helpers import setup_logger
 from parsers.location_parser.job import run as run_location_job
 from parsers.ranking_parser.job import run as run_ranking_job
