@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 import json
-import token
+import pdb
 from parsers.helpers import setup_logger
 from parsers.location_parser.job import run as run_location_job
 from parsers.ranking_parser.job import run as run_ranking_job
@@ -14,7 +14,7 @@ RESULTS_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), 'result
 def main():
     logger = setup_logger(name="main_job")
     run_jobs(logger)
-    # save_to_azure(logger)
+    save_to_azure(logger)
 
 def run_jobs(logger):
     clear_results()
@@ -38,7 +38,7 @@ def save_to_azure(logger):
     logger.info("Successfully uploaded results to Azure Blob Storage")
 
 def send_results_to_azure(azure_config, date):
-    connection_string = f"{azure_config['connectionString']}?{azure_config['sasToken']}"
+    connection_string = f"{azure_config['connectionString']}{azure_config['accessKey']}"
     blob_container_client = BlobServiceClient.from_connection_string(connection_string).get_container_client(azure_config['containerName'])
     files = files_to_upload()
     for file_path, file_name in files:

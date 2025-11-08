@@ -1,5 +1,5 @@
 {
-    "sasToken": "SUKA_BLYAT",
-    "connectionString": "https://escortstorage1.blob.core.windows.net/escort-raw",
+    "accessKey": "SUKA_BLYAT",
+    "connectionString": "DefaultEndpointsProtocol=https;AccountName=escortstorage1;AccountKey=",
     "containerName": "escort-raw"
 }
