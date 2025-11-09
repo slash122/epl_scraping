@@ -25,7 +25,8 @@ class RankingParser(BaseParser):
     def run(self):
         self.logger.info("Started parsing rankings...")
         self.save_to_results(self.parse_location_rankings())
-        self.save_to_results(self.failed_locations, error=True)
+        if self.failed_locations:
+            self.save_to_results(self.failed_locations, error=True)
         self.logger.info("Ranking parsing completed and results saved.")
 
     # Iterate over all provinces
