@@ -11,30 +11,30 @@ from parsers.location_parser.parser import LocationParser
 
 class ContentParser(BaseParser):
     CHUNK_SIZE = 100
-    PARSER_TYPE = 'content'
+    PARSER_TYPE = "content"
     XPATHS = {
-        'title': '//div[contains(@class, "content-name")]//h1',
-        'description': '//div[contains(@class, "content-desc")]//div[@id="PL"]',
-        'price_template': '//div[contains(@class, "prices")]//div[contains(text(), "{keyword}")]/following-sibling::div[1]',
-        'images': '//div[@class="galleryContainer"]//img/@src',
-        'stat_template': "//div[contains(@class, 'stat-elem')]//div[contains(text(), '{keyword}')]/following-sibling::div[1]",
+        "title": '//div[contains(@class, "content-name")]//h1',
+        "description": '//div[contains(@class, "content-desc")]//div[@id="PL"]',
+        "price_template": '//div[contains(@class, "prices")]//div[contains(text(), "{keyword}")]/following-sibling::div[1]',
+        "images": '//div[@class="galleryContainer"]//img/@src',
+        "stat_template": "//div[contains(@class, 'stat-elem')]//div[contains(text(), '{keyword}')]/following-sibling::div[1]",
     }
     STATS_KEYWORDS = {
-        'age': 'Wiek',
-        'height': 'Wzrost',
-        'weight': 'Waga',
-        'wzrost': 'Wzrost',
-        'breasts': 'Biust',
-        'eyes': 'Oczy',
-        'hair': 'Włosy',
-        'languages': 'Języki',
+        "age": "Wiek",
+        "height": "Wzrost",
+        "weight": "Waga",
+        "wzrost": "Wzrost",
+        "breasts": "Biust",
+        "eyes": "Oczy",
+        "hair": "Włosy",
+        "languages": "Języki",
     }
     PRICE_KEYWORDS = {
-        '1_hour': '1 godz',
-        'noc': 'Noc',
-        '30_min': '0,5 godz',
-        '2_hours': '2 godz',
-        '15_min': '15 min',
+        "1_hour": "1 godz",
+        "noc": "Noc",
+        "30_min": "0,5 godz",
+        "2_hours": "2 godz",
+        "15_min": "15 min",
     }
 
     def __init__(self, advertisement_urls, cookies, logger, batch_num=1):
@@ -55,7 +55,10 @@ class ContentParser(BaseParser):
         try:
             for index, url in enumerate(self.advertisement_urls):
                 advertisements.append(self.parse_advertisement(url))
-                if (index+1) % ContentParser.CHUNK_SIZE == 0: self.save_chunk(advertisements, first=(index+1==ContentParser.CHUNK_SIZE))
+                if (index + 1) % ContentParser.CHUNK_SIZE == 0:
+                    self.save_chunk(
+                        advertisements, first=(index + 1 == ContentParser.CHUNK_SIZE)
+                    )
         except Exception as e:
             self.logger.error(f"Error occurred while parsing advertisements: {e}")
         self.save_chunk(advertisements, last=True)
@@ -81,39 +84,42 @@ class ContentParser(BaseParser):
 
             if last:
                 file.write("]\n")
-        buffer.clear()    
-
+        buffer.clear()
 
     def parse_advertisement(self, url):
         html = self.request_advertisement_page(url)
         return ContentParser.create_advertisement_dict(html, url)
-    
+
     def request_advertisement_page(self, url):
         response = self.session.get(url, cookies=self.cookies)
         html = etree.HTML(response.text)
         del response
         return html
-    
+
     @staticmethod
     def create_advertisement_dict(html, url):
-        price_stats = ContentParser.template_keywords(ContentParser.PRICE_KEYWORDS, html, ContentParser.XPATHS['price_template'])
-        quality_stats = ContentParser.template_keywords(ContentParser.STATS_KEYWORDS, html, ContentParser.XPATHS['stat_template'])
-        title_nodes = html.xpath(ContentParser.XPATHS['title'])
-        desc_nodes = html.xpath(ContentParser.XPATHS['description'])
-        images = html.xpath(ContentParser.XPATHS['images']) or []
+        price_stats = ContentParser.template_keywords(
+            ContentParser.PRICE_KEYWORDS, html, ContentParser.XPATHS["price_template"]
+        )
+        quality_stats = ContentParser.template_keywords(
+            ContentParser.STATS_KEYWORDS, html, ContentParser.XPATHS["stat_template"]
+        )
+        title_nodes = html.xpath(ContentParser.XPATHS["title"])
+        desc_nodes = html.xpath(ContentParser.XPATHS["description"])
+        images = html.xpath(ContentParser.XPATHS["images"]) or []
 
         title = title_nodes[0].text.strip() if title_nodes else None
         description = desc_nodes[0].text.strip() if desc_nodes else None
 
         return {
-            'url': url,
-            'title': title,
-            'description': description,
-            'images': images,
-            'qualities': quality_stats,
-            'prices': price_stats,
+            "url": url,
+            "title": title,
+            "description": description,
+            "images": images,
+            "qualities": quality_stats,
+            "prices": price_stats,
         }
-    
+
     @staticmethod
     def template_keywords(template_dict, html, template_xpath):
         result = {}
@@ -122,8 +128,10 @@ class ContentParser(BaseParser):
             value = html.xpath(xpath)
             result[key] = value[0].text.strip() if value else None
         return result
-    
+
     def create_result_filepath(self) -> str:
-        date = datetime.now(timezone.utc).strftime('%Y-%m-%d_%H-%M')
+        date = datetime.now(timezone.utc).strftime("%Y-%m-%d_%H-%M")
         filename = f"{date}_{self.PARSER_TYPE}_{self.batch_num}.json"
-        return os.path.join(BaseParser.results_directory_path(), f"{self.PARSER_TYPE}_results", filename)
+        return os.path.join(
+            BaseParser.results_directory_path(), f"{self.PARSER_TYPE}_results", filename
+        )
