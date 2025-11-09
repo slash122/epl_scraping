@@ -1,6 +1,7 @@
 import requests
 from parsers.base_parser import BaseParser
 from lxml import etree
+import copy
 
 
 class RankingParser(BaseParser):
@@ -19,27 +20,40 @@ class RankingParser(BaseParser):
         self.location_data = location_data
         self.cookies = cookies
         self.logger = logger
+        self.failed_locations = []
 
     def run(self):
         self.logger.info("Started parsing rankings...")
         self.save_to_results(self.parse_location_rankings())
+        self.save_to_results(self.failed_locations, error=True)
         self.logger.info("Ranking parsing completed and results saved.")
 
     # Iterate over all provinces
     def parse_location_rankings(self):
-        location_rankings = []
+        self.location_rankings = []
         for province in self.location_data:
+            self.process_province(province)
+        return self.location_rankings
+
+    def process_province(self, province):
+        try:
             province_rankings = {**province, "cities": []}
             province_rankings["cities"] = RankingParser.parse_province_rankings(
                 self, province
             )
-            location_rankings.append(province_rankings)
-        return location_rankings
+            self.location_rankings.append(province_rankings)
+        except Exception as e:
+            self.logger.error(
+                f"Error occurred while processing province {province['name']}: {e}"
+            )
+            self.failed_locations.append(province)
 
     # Iterate over all cities in a province
     def parse_province_rankings(self, province):
         cities = []
         for city in province["cities"]:
+            city = copy.deepcopy(city)
+
             self.logger.info(
                 f"Parsing advertisements for {province['name']} - {city['name']}"
             )

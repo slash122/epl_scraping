@@ -55,9 +55,10 @@ def prepare_rankings(rankings_file, threads_num=1):
 
 def get_rankings_data(rankings_file):
     if not rankings_file:
-        rankings_file = os.path.join(
-            RANKINGS_RESULTS_FOLDER, sorted(os.listdir(RANKINGS_RESULTS_FOLDER))[-1]
-        )
+        files = [f for f in os.listdir(RANKINGS_RESULTS_FOLDER) if "error" not in f.lower()]
+        if not files:
+            raise FileNotFoundError("No rankings file available")
+        rankings_file = os.path.join(RANKINGS_RESULTS_FOLDER, sorted(files)[-1])
 
     with open(rankings_file, "r") as f:
         rankings_data = json.load(f)

@@ -32,8 +32,7 @@ def save_to_azure(logger):
         date = datetime.now(timezone.utc).strftime('%Y-%m-%d_%H-%M')
         send_results_to_azure(azure_config, date)
     except Exception as e:
-        logger.error(f"Failed to write results to Azure Blob Storage: {e}")
-        return
+        raise e
     logger.info("Successfully uploaded results to Azure Blob Storage")
 
 def send_results_to_azure(azure_config, date):
